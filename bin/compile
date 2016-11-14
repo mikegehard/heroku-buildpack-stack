@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir> <env-dir>
+# bin/compile <build-dir> <cache-dir>
 
 set -e
 set -o pipefail
@@ -14,14 +14,14 @@ function speak (){
 }
 
 # Usage: $ set-env key value
-function set-env (){
-  echo "export $1=$2" >> "$PROFILE_PATH"
-}
+# function set-env (){
+#   echo "export $1=$2" >> "$PROFILE_PATH"
+# }
 
-# Usage: $ set-default-env key value
-function set-default-env (){
-  echo "export $1=\${$1:-$2}" >> "$PROFILE_PATH"
-}
+# # Usage: $ set-default-env key value
+# function set-default-env (){
+#   echo "export $1=\${$1:-$2}" >> "$PROFILE_PATH"
+# }
 
 speak "Starting..."
 
@@ -40,15 +40,15 @@ speak "Starting..."
 # mkdir -p "$WORK_DIR/vendor/bin"
 # mkdir -p "$WORK_DIR/vendor/ghc-libs"
 
-PROFILE_DIR="$BUILD_DIR/.profile.d"
-PROFILE_PATH="$PROFILE_DIR/stack.sh"
-mkdir -p "$PROFILE_DIR"
+# PROFILE_DIR="$BUILD_DIR/.profile.d"
+# PROFILE_PATH="$PROFILE_DIR/stack.sh"
+# mkdir -p "$PROFILE_DIR"
 
 export LANG=en_US.UTF-8
 # export LIBRARY_PATH=$BUILD_DIR/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 # export LD_LIBRARY_PATH=$LIBRARY_PATH
-export PATH=$BUILD_DIR/.local/bin:$BUILD_DIR/vendor/bin:$PATH
-export STACK_ROOT=$CACHE_DIR/.stack
+# export PATH=$BUILD_DIR/.local/bin:$BUILD_DIR/vendor/bin:$PATH
+# export STACK_ROOT=$CACHE_DIR/.stack
 
 ########## gmp #####################################################
 # LIBGMP_VER=${LIBGMP_VER:-6.0.0a}
@@ -92,14 +92,14 @@ fi
 speak "Running stack"
 cd "$BUILD_DIR"
 $STACK_EXE setup
-$STACK_EXE build --fast --copy-bins
+$STACK_EXE build --fast
 
 # Set context environment variables.
-set-env PATH "$(stack path --local-bin):$PATH"
+# set-env PATH "$(stack path --local-bin):$PATH"
 # set-default-env LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 # set-default-env LD_LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 
-speak "Making stack binaries available"
+# speak "Making stack binaries available"
 # mkdir -p "$BUILD_DIR/vendor"
 # mkdir -p "$BUILD_DIR/.local"
 # mv "$WORK_DIR/vendor/ghc-libs" "$BUILD_DIR/vendor"
