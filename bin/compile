@@ -3,7 +3,7 @@
 
 set -e
 set -o pipefail
-set -x
+# set -x
 
 # Heroku-provided params
 BUILD_DIR="$1"
@@ -14,6 +14,9 @@ function speak (){
   echo "-----> $(date -u '+%Y-%m-%d_%H:%M:%S') $1"
 }
 
+PROFILE_DIR="$BUILD_DIR/.profile.d"
+PROFILE_PATH="$PROFILE_DIR/stack.sh"
+mkdir -p "$PROFILE_DIR"
 # Usage: $ set-env key value
 function set-env (){
   echo "export $1=$2" >> "$PROFILE_PATH"
@@ -25,8 +28,8 @@ function set-env (){
 # }
 
 speak "Starting..."
-speak "Build dir = $BUILD_DIR"
-speak "Cache dir = $CACHE_DIR"
+# speak "Build dir = $BUILD_DIR"
+# speak "Cache dir = $CACHE_DIR"
 
 # BLACKLIST_REGEX="^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$"
 # if [ -d "$ENV_DIR" ]; then
@@ -42,10 +45,6 @@ speak "Cache dir = $CACHE_DIR"
 # cp -Rp "$BUILD_DIR/." "$WORK_DIR"
 # mkdir -p "$WORK_DIR/vendor/bin"
 # mkdir -p "$WORK_DIR/vendor/ghc-libs"
-
-PROFILE_DIR="$BUILD_DIR/.profile.d"
-PROFILE_PATH="$PROFILE_DIR/stack.sh"
-mkdir -p "$PROFILE_DIR"
 
 export LANG=en_US.UTF-8
 # export LIBRARY_PATH=$BUILD_DIR/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
