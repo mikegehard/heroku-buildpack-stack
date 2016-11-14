@@ -3,6 +3,7 @@
 
 set -e
 set -o pipefail
+set -x
 
 # Heroku-provided params
 BUILD_DIR="$1"
@@ -14,9 +15,9 @@ function speak (){
 }
 
 # Usage: $ set-env key value
-# function set-env (){
-#   echo "export $1=$2" >> "$PROFILE_PATH"
-# }
+function set-env (){
+  echo "export $1=$2" >> "$PROFILE_PATH"
+}
 
 # # Usage: $ set-default-env key value
 # function set-default-env (){
@@ -24,6 +25,8 @@ function speak (){
 # }
 
 speak "Starting..."
+speak "Build dir = $BUILD_DIR"
+speak "Cache dir = $CACHE_DIR"
 
 # BLACKLIST_REGEX="^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$"
 # if [ -d "$ENV_DIR" ]; then
@@ -40,9 +43,9 @@ speak "Starting..."
 # mkdir -p "$WORK_DIR/vendor/bin"
 # mkdir -p "$WORK_DIR/vendor/ghc-libs"
 
-# PROFILE_DIR="$BUILD_DIR/.profile.d"
-# PROFILE_PATH="$PROFILE_DIR/stack.sh"
-# mkdir -p "$PROFILE_DIR"
+PROFILE_DIR="$BUILD_DIR/.profile.d"
+PROFILE_PATH="$PROFILE_DIR/stack.sh"
+mkdir -p "$PROFILE_DIR"
 
 export LANG=en_US.UTF-8
 # export LIBRARY_PATH=$BUILD_DIR/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
@@ -74,6 +77,8 @@ if [ ! -e "$STACK_EXE" ]; then
   chmod u+x $STACK_EXE
 fi
 
+cp $STACK_EXE $BUILD_DIR
+
 ########## stack vars ##############################################
 # if [ -d "$ENV_DIR" ]; then
 #   speak "Substituting stack vars"
@@ -91,11 +96,11 @@ fi
 
 speak "Running stack"
 cd "$BUILD_DIR"
-$STACK_EXE setup
-$STACK_EXE build --fast
+stack setup
+stack build --fast --copy-bins
 
 # Set context environment variables.
-# set-env PATH "$(stack path --local-bin):$PATH"
+set-env PATH "$(stack path --local-bin):$PATH"
 # set-default-env LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 # set-default-env LD_LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 
