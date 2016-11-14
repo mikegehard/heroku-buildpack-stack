@@ -3,4 +3,4 @@
 
 BUILD_DIR=$1
 
-echo -e $BUILD_DIR/foo.yml
+echo "$(cat $BUILD_DIR/foo.yml)"
