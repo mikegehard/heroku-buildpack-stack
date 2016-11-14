@@ -74,7 +74,7 @@ if [ ! -e "$STACK_EXE" ]; then
   speak "Downloading stack-$STACK_VER"
   mkdir -p "$STACK_DIR"
   curl -# -L "$STACK_URL" | tar xz -C "$STACK_DIR" --strip-components=1
-  chmod a+x $STACK_EXE
+  chmod u+x $STACK_EXE
 fi
 
 cp $STACK_EXE $BUILD_DIR
@@ -96,6 +96,7 @@ fi
 
 speak "Running stack"
 cd "$BUILD_DIR"
+ls $BUILD_DIR
 stack setup
 stack build --fast --copy-bins
 
