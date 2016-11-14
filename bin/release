@@ -2,8 +2,5 @@
 # bin/release <build-dir>
 
 BUILD_DIR=$1
-cd $BUILD_DIR
 
-BIN_DIR=$BUILD_DIR/bin
-
-echo -e "---\ndefault_process_types:\n  web: $BIN_DIR/`ls $BIN_DIR`"
+echo -e $BUILD_DIR/foo.yml
