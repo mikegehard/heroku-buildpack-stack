@@ -96,12 +96,11 @@ fi
 
 speak "Running stack"
 cd "$BUILD_DIR"
-ls $BUILD_DIR
-stack setup
-stack build --fast --copy-bins
+./stack setup
+./stack build --fast --copy-bins
 
 # Set context environment variables.
-set-env PATH "$(stack path --local-bin):$PATH"
+set-env PATH "$(./stack path --local-bin):$PATH"
 # set-default-env LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 # set-default-env LD_LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 
