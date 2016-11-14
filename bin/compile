@@ -3,7 +3,7 @@
 
 set -e
 set -o pipefail
-# set -x
+set -x
 
 # Heroku-provided params
 BUILD_DIR="$1"
@@ -28,8 +28,9 @@ function set-env (){
 # }
 
 speak "Starting..."
-# speak "Build dir = $BUILD_DIR"
-# speak "Cache dir = $CACHE_DIR"
+speak "Build dir = $BUILD_DIR"
+speak "Cache dir = $CACHE_DIR"
+speak "3rd arg = $3"
 
 # BLACKLIST_REGEX="^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$"
 # if [ -d "$ENV_DIR" ]; then
@@ -99,15 +100,16 @@ cd "$BUILD_DIR"
 ./stack build --fast --copy-bins
 
 # Set context environment variables.
-set-env PATH "$(./stack path --local-bin):$PATH"
+# set-env PATH "$(./stack path --local-bin):$PATH"
 # set-default-env LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 # set-default-env LD_LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
 
 # speak "Making stack binaries available"
 # mkdir -p "$BUILD_DIR/vendor"
-# mkdir -p "$BUILD_DIR/.local"
+mkdir -p "$BUILD_DIR/bin"
 # mv "$WORK_DIR/vendor/ghc-libs" "$BUILD_DIR/vendor"
-# mv "$WORK_DIR/.local/bin" "$BUILD_DIR/.local"
+mv "$(./stack path --local-bin)/*" "$BUILD_DIR/bin"
+tree $BUILD_DIR
 
 speak "Caching .stack-work"
 rsync -avq "$BUILD_DIR/.stack-work/" "$SANDBOX_DIR"

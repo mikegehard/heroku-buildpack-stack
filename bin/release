@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
-set -ex
+BUILD_DIR=$1
+cd $BUILD_DIR
 
-cd $1
+BIN_DIR=$BUILD_DIR/bin
 
-echo -e "---\ndefault_process_types:\n  web: $(./stack path --local-bin)/$(ls `./stack path --local-bin`)"
+echo -e "---\ndefault_process_types:\n  web: $BIN_DIR/`ls $BIN_DIR`"
