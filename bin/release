@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
+set -ex
+
 cd $1
 
 echo -e "---\ndefault_process_types:\n  web: $(./stack path --local-bin)/$(ls `./stack path --local-bin`)"
