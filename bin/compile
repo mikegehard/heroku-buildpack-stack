@@ -107,7 +107,6 @@ cd "$BUILD_DIR"
 mkdir -p "$BUILD_DIR/bin"
 # mv "$WORK_DIR/vendor/ghc-libs" "$BUILD_DIR/vendor"
 ls -aR $(./stack path --local-install-root)/bin
-tree $BUILD_DIR
 mv "$(./stack path --local-install-root)/bin/*" "$BUILD_DIR/bin"
 
 echo -e "---\ndefault_process_types:\n  web: /home/vcap/app/bin/`ls $BUILD_DIR/bin`" > $BUILD_DIR/foo.yml
