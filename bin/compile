@@ -33,9 +33,10 @@ fi
 # cp $STACK_EXE $BUILD_DIR
 
 ########## project build ###########################################
-SANDBOX_DIR="$CACHE_DIR/.stack-work"
+STACK_DIR=".stack-work"
+SANDBOX_DIR="$CACHE_DIR/$STACK_DIR"
 if [ -e "$SANDBOX_DIR" ]; then
-    speak "Restoring .stack-work to $BUILD_DIR"
+    speak "Restoring $STACK_DIR to $BUILD_DIR"
     cp -Rp "$SANDBOX_DIR" "$BUILD_DIR"
 else
     mkdir -p "$SANDBOX_DIR"
@@ -54,6 +55,6 @@ echo -e "---\ndefault_process_types:\n  web: /home/vcap/app/bin/`ls $BUILD_DIR/b
 
 speak "Caching .stack-work"
 rm -rf $SANDBOX_DIR
-cp -Rp $BUILD_DIR/.stack-work $SANDBOX_DIR
+cp -Rp $BUILD_DIR/$STACK_DIR $SANDBOX_DIR
 
 speak "Finished!"
