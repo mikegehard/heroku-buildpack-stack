@@ -30,8 +30,6 @@ if [ ! -e "$STACK_EXE" ]; then
   chmod u+x $STACK_EXE
 fi
 
-# cp $STACK_EXE $BUILD_DIR
-
 ########## project build ###########################################
 STACK_DIR=".stack-work"
 SANDBOX_DIR="$CACHE_DIR/$STACK_DIR"
@@ -51,6 +49,7 @@ speak "Making stack binaries available"
 mkdir -p "$BUILD_DIR/bin"
 mv $($STACK_EXE path --local-install-root)/bin/* $BUILD_DIR/bin
 
+speak "Writing out start script"
 echo -e "---\ndefault_process_types:\n  web: /home/vcap/app/bin/`ls $BUILD_DIR/bin`" > $BUILD_DIR/startScript.yml
 
 speak "Caching .stack-work"
