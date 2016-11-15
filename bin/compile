@@ -17,6 +17,9 @@ function speak (){
 speak "Starting..."
 
 export LANG=en_US.UTF-8
+# Make sure all the stack stuff ends up in the cache as well
+# This will allow for faster compiles on subsequent pushes.
+export STACK_ROOT=$CACHE_DIR/.stack
 
 ########## stack exe ###############################################
 STACK_VER=${STACK_VER:-1.2.0}
@@ -36,8 +39,6 @@ SANDBOX_DIR="$CACHE_DIR/$STACK_DIR"
 if [ -e "$SANDBOX_DIR" ]; then
     speak "Restoring $STACK_DIR to $BUILD_DIR"
     cp -Rp "$SANDBOX_DIR" "$BUILD_DIR"
-else
-    mkdir -p "$SANDBOX_DIR"
 fi
 
 speak "Running stack"
