@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir>
 
+# Thanks to https://github.com/mfine/heroku-buildpack-stack/blob/master/bin/compile
+# for the inspiration.
+
 set -e
 set -o pipefail
-set -x
 
-# Heroku-provided params
 BUILD_DIR="$1"
 CACHE_DIR="$2"
 
@@ -13,55 +14,9 @@ function speak (){
   echo "-----> $(date -u '+%Y-%m-%d_%H:%M:%S') $1"
 }
 
-# PROFILE_DIR="$BUILD_DIR/.profile.d"
-# PROFILE_PATH="$PROFILE_DIR/stack.sh"
-# mkdir -p "$PROFILE_DIR"
-# # Usage: $ set-env key value
-# function set-env (){
-#   echo "export $1=$2" >> "$PROFILE_PATH"
-# }
-
-# # Usage: $ set-default-env key value
-# function set-default-env (){
-#   echo "export $1=\${$1:-$2}" >> "$PROFILE_PATH"
-# }
-
 speak "Starting..."
-speak "Build dir = $BUILD_DIR"
-speak "Cache dir = $CACHE_DIR"
-
-# BLACKLIST_REGEX="^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$"
-# if [ -d "$ENV_DIR" ]; then
-#   speak "Exporting config vars"
-#   for e in $(ls "$ENV_DIR"); do
-#     echo "$e" | grep -qvE "$BLACKLIST_REGEX" &&
-#     export "$e=$(cat $ENV_DIR/$e)"
-#     :
-#   done
-# fi
-
-# WORK_DIR=/app
-# cp -Rp "$BUILD_DIR/." "$WORK_DIR"
-# mkdir -p "$WORK_DIR/vendor/bin"
-# mkdir -p "$WORK_DIR/vendor/ghc-libs"
 
 export LANG=en_US.UTF-8
-# export LIBRARY_PATH=$BUILD_DIR/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
-# export LD_LIBRARY_PATH=$LIBRARY_PATH
-# export PATH=$BUILD_DIR/.local/bin:$BUILD_DIR/vendor/bin:$PATH
-# export STACK_ROOT=$CACHE_DIR/.stack
-
-########## gmp #####################################################
-# LIBGMP_VER=${LIBGMP_VER:-6.0.0a}
-# LIBGMP_URL=${LIBGMP_URL:-https://s3.amazonaws.com/heroku-ghc/heroku-libgmp-"$LIBGMP_VER".tar.gz}
-# LIBGMP_DIR="$CACHE_DIR/libgmp-$LIBGMP_VER"
-# if [ ! -e "$LIBGMP_DIR" ]; then
-#   speak "Installing libgmp-$LIBGMP_VER into cache"
-#   mkdir -p "$LIBGMP_DIR"
-#   curl -# -L "$LIBGMP_URL" | tar xz -C "$LIBGMP_DIR"
-# fi
-# speak "Restoring $LIBGMP_VER files from cache"
-# cp -Rp "$LIBGMP_DIR/ghc-libs/." "$BUILD_DIR/vendor/ghc-libs"
 
 ########## stack exe ###############################################
 STACK_VER=${STACK_VER:-1.2.0}
@@ -75,13 +30,7 @@ if [ ! -e "$STACK_EXE" ]; then
   chmod u+x $STACK_EXE
 fi
 
-cp $STACK_EXE $BUILD_DIR
-
-########## stack vars ##############################################
-# if [ -d "$ENV_DIR" ]; then
-#   speak "Substituting stack vars"
-#   perl -p -i -e 's/\{\{([^}]+)\}\}/defined$ENV{$1}?$ENV{$1}:$&/eg' "$BUILD_DIR/stack.yaml"
-# fi
+# cp $STACK_EXE $BUILD_DIR
 
 ########## project build ###########################################
 SANDBOX_DIR="$CACHE_DIR/.stack-work"
@@ -94,25 +43,17 @@ fi
 
 speak "Running stack"
 cd "$BUILD_DIR"
-./stack setup
-./stack build --fast
+$STACK_EXE setup
+$STACK_EXE build --fast
 
-# Set context environment variables.
-# set-env PATH "$(./stack path --local-bin):$PATH"
-# set-default-env LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
-# set-default-env LD_LIBRARY_PATH "$BUILD_DIR/vendor/ghc-libs:/usr/lib"
-
-# speak "Making stack binaries available"
-# mkdir -p "$BUILD_DIR/vendor"
+speak "Making stack binaries available"
 mkdir -p "$BUILD_DIR/bin"
-# mv "$WORK_DIR/vendor/ghc-libs" "$BUILD_DIR/vendor"
-mv $(./stack path --local-install-root)/bin/* $BUILD_DIR/bin
+mv $($STACK_EXE path --local-install-root)/bin/* $BUILD_DIR/bin
 
-echo -e "---\ndefault_process_types:\n  web: /home/vcap/app/bin/`ls $BUILD_DIR/bin`" > $BUILD_DIR/foo.yml
-cat $BUILD_DIR/foo.yml
+echo -e "---\ndefault_process_types:\n  web: /home/vcap/app/bin/`ls $BUILD_DIR/bin`" > $BUILD_DIR/startScript.yml
 
 speak "Caching .stack-work"
-rsync -avq $BUILD_DIR/.stack-work/ $SANDBOX_DIR
-# mv "$WORK_DIR/.stack-work" "$BUILD_DIR"
+rm -rf $SANDBOX_DIR
+cp -Rp $BUILD_DIR/.stack-work $SANDBOX_DIR
 
 speak "Finished!"
